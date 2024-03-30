@@ -13,17 +13,42 @@ import { PulseLoader } from "react-spinners";
 const AirDrop = () => {
   const [address, setAddress] = useState("");
   const [amount, setAmount] = useState("");
-  const [error, setError] = useState<any>();
   const [isLoading, setIsLoading] = useState(false);
+  const [balanceLoader, setBalanceLoader] = useState(false);
 
-  const [status, setStatus] = React.useState<
-    "info" | "success" | "error" | "warning"
-  >("info");
+  const handleBalance = async () => {
+    try {
+      setBalanceLoader(true);
+      let publicKey: any = {};
+      try {
+        publicKey = new PublicKey(address);
+      } catch (error: any) {
+        setBalanceLoader(false);
+        if (error?.message === "Invalid public key input") {
+          toast.error("Invalid Solana Wallet Address!");
+        } else {
+          toast.error(error?.message || "Error");
+        }
+        return;
+      }
+      const connection = new Connection(
+        "https://api.devnet.solana.com",
+        "confirmed"
+      );
+      const walletBalance = await connection.getBalance(publicKey);
+      setBalanceLoader(false);
+      toast.success(
+        `wallet ballance is ◎${walletBalance / LAMPORTS_PER_SOL} SOL`
+      );
+    } catch (err: any) {
+      setBalanceLoader(false);
+      toast.error(err);
+    }
+  };
 
   const handleFormSubmit = async (event: any) => {
     event.preventDefault();
     try {
-      setStatus("warning");
       setIsLoading(true);
       let publicKey: any = {};
       try {
@@ -49,31 +74,34 @@ const AirDrop = () => {
 
       await connection.confirmTransaction(fromAirDropSignature);
 
-      setStatus("success");
       setIsLoading(false);
       toast.success("Airdrop Successfull");
 
       setAddress("");
       setAmount("");
     } catch (error: any) {
-      //   const errorObject = JSON.parse(error);
-      //   const errorMessage = errorObject.error.message;
-      toast.error("Airdrop failed");
+      toast.error("Airdrop failed", {
+        duration: 1000,
+      });
+      toast.error(
+        "You have requested too many airdrops. Wait 24 hours for a refill.",
+        {
+          duration: 3000,
+        }
+      );
       setIsLoading(false);
-      setError(error);
-      setStatus("error");
     }
   };
 
   return (
     <div className="w-full h-[80vh]">
       <div className="flex justify-center items-center flex-col h-full">
-        <h1 className="text-center mt-7 text-6xl font-medium bg-gradient-to-r from-purple-400 to-blue-500 text-transparent bg-clip-text">
+        <h1 className="text-center mt-7 md:text-6xl text-2xl font-medium bg-gradient-to-r from-purple-400 to-blue-500 text-transparent bg-clip-text">
           Solana Airdrop App
         </h1>
         <form
           onSubmit={handleFormSubmit}
-          className="w-[50%] h-64 p-6 rounded-lg shadow-lg items-center justify-center flex flex-col"
+          className="w-[50%] h-64 p-6 pb-0 rounded-lg shadow-lg items-center justify-center md:flex flex-col"
         >
           <input
             type="text"
@@ -93,12 +121,29 @@ const AirDrop = () => {
             onChange={(event) => setAmount(event.target.value)}
           />
 
-          <button
-            type="submit"
-            className="w-40 justify-center items-center bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 rounded-lg focus:outline-none focus:shadow-outline"
-          >
-            {isLoading ? <PulseLoader color="#ffffff" size={10} /> : "Air Drop"}
-          </button>
+          <div className="flex gap-5 flex-col md:flex-row md:gap-5">
+            <button
+              type="submit"
+              className="w-full md:w-40 justify-center md:rounded-lg items-center bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 rounded-lg focus:outline-none focus:shadow-outline md:focus:rounded-lg"
+            >
+              {isLoading ? (
+                <PulseLoader color="#ffffff" size={10} />
+              ) : (
+                "Air Drop"
+              )}
+            </button>
+            <button
+              type="button"
+              onClick={handleBalance}
+              className="w-full md:w-40 justify-center items-center bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 rounded-lg focus:outline-none focus:shadow-outline md:rounded-lg md:focus:rounded-lg"
+            >
+              {balanceLoader ? (
+                <PulseLoader color="#ffffff" size={10} />
+              ) : (
+                "Check Balance"
+              )}
+            </button>
+          </div>
         </form>
       </div>
     </div>
