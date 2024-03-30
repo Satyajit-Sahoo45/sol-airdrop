@@ -117,7 +117,7 @@ const AirDrop = () => {
             name=""
             value={amount}
             className="[appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none w-full px-4 py-2 mb-4 bg-gray-800 text-gray-100 rounded-lg focus:outline-none focus:bg-gray-700"
-            placeholder="Eample: 1 SOL"
+            placeholder="Example: 1 SOL"
             onChange={(event) => setAmount(event.target.value)}
           />
 
