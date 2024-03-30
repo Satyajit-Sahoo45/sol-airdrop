@@ -109,7 +109,7 @@ const AirDrop = () => {
         </h1>
         <form
           onSubmit={handleFormSubmit}
-          className="w-[50%] h-64 p-6 pb-0 rounded-lg shadow-lg items-center justify-center md:flex flex-col"
+          className="w-[100%] sm:w-[100%] md:w-[50%] h-64 p-6 pb-0 rounded-lg shadow-lg items-center justify-center md:flex flex-col"
         >
           <input
             type="text"
