@@ -18,6 +18,10 @@ const AirDrop = () => {
 
   const handleBalance = async () => {
     try {
+      if (address === "") {
+        toast.error("Enter wallet address to check balance");
+        return;
+      }
       setBalanceLoader(true);
       let publicKey: any = {};
       try {
@@ -49,6 +53,10 @@ const AirDrop = () => {
   const handleFormSubmit = async (event: any) => {
     event.preventDefault();
     try {
+      if (address === "" && amount === "") {
+        toast.error("Fill both the fields for Airdrop");
+        return;
+      }
       setIsLoading(true);
       let publicKey: any = {};
       try {
